@@ -76,11 +76,16 @@ h2{font-size:19px; letter-spacing:.01em}
 .row .when{font-family:var(--display); font-size:18px; color:var(--k-ink); background:var(--k-tint); border:2px solid var(--edge); padding:4px 10px; border-radius:10px; white-space:nowrap}
 
 .search{background:var(--surface); padding:18px; display:flex; flex-direction:column; gap:16px; margin-right:5px}
-.fields{display:flex; flex-wrap:wrap; gap:10px; align-items:flex-end}
-.field{display:flex; flex-direction:column; gap:4px; flex:1 1 150px; min-width:0}
-.field label{font-size:13px; font-weight:800; color:var(--muted)}
+.fields{display:grid; grid-template-columns:minmax(0,1fr) 112px; gap:10px; align-items:end}
+.fields .reset{grid-column:1 / -1; justify-self:start}
+@media (min-width:430px){ .fields{grid-template-columns:minmax(0,1fr) 112px auto} .fields .reset{grid-column:auto} }
+.field{display:flex; flex-direction:column; gap:4px; min-width:0}
+.field label{font-size:13px; font-weight:800; color:var(--muted); line-height:1.2}
 input,select,button{font:inherit; color:inherit}
-input[type=date],select{height:48px; border-radius:10px; border:2px solid var(--edge); background:var(--bg); padding:0 12px; font-weight:700; width:100%; min-width:0}
+input[type=date],select{display:block; box-sizing:border-box; height:48px; border-radius:10px; border:2px solid var(--edge); background:var(--bg); padding:0 12px; font-weight:700; font-size:16px; width:100%; min-width:0; max-width:100%; margin:0}
+input[type=date]{-webkit-appearance:none; appearance:none; line-height:44px; text-align:left}
+input[type=date]::-webkit-date-and-time-value{text-align:left; margin:0}
+input[type=date]::-webkit-datetime-edit{padding:0}
 button.reset{height:48px; border-radius:10px; border:2px solid var(--edge); background:var(--coral); color:#2B2A33; padding:0 16px; font-weight:800; cursor:pointer; flex:0 0 auto; box-shadow:3px 3px 0 var(--edge)}
 button.reset:active{transform:translate(2px,2px); box-shadow:1px 1px 0 var(--edge)}
 :focus-visible{outline:3px solid var(--coral); outline-offset:3px}
@@ -135,7 +140,7 @@ footer p{margin:0}
     <h2 id="searchTitle">Chercher un créneau</h2>
     <div class="fields">
       <div class="field"><label for="qDate">Date</label><input type="date" id="qDate"></div>
-      <div class="field" style="flex:0 1 120px"><label for="qHour">Heure</label><select id="qHour"></select></div>
+      <div class="field"><label for="qHour">Heure</label><select id="qHour"></select></div>
       <button type="button" class="reset" id="qNow">Maintenant</button>
     </div>
     <div class="answer k-g" id="answer" aria-live="polite">
@@ -151,13 +156,13 @@ footer p{margin:0}
 
   <footer>
     <p>La règle : jour du mois + heure, divisé par 3. Reste 1 : Gabriel. Reste 2 : Clément. Reste 0 : Austin.</p>
-    <p>Télé Enfants v<span id="ver">1.0.0</span></p>
+    <p>Télé Enfants v<span id="ver">1.0.1</span></p>
   </footer>
 </div>
 
 <script>
 (function(){
-  var VERSION = '1.0.0';
+  var VERSION = '1.0.1';
   document.getElementById('ver').textContent = VERSION;
   var KIDS = [
     {key:'a', name:'Austin', initial:'A'},

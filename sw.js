@@ -1,5 +1,5 @@
 // Télé Enfants : fonctionne hors connexion (la règle est calculée sur le téléphone).
-const CACHE = 'tele-enfants-v1.0.0';
+const CACHE = 'tele-enfants-v1.0.1';
 const CORE = [
   './',
   './index.html',
