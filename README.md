@@ -17,6 +17,7 @@ Exemple : le 10 à 13h, 10 + 13 = 23, 23 = 7 × 3 + 2, donc c'est Clément.
 - Affiche qui a la télé en ce moment, et combien de temps il reste.
 - Donne le prochain créneau de chacun des deux autres frères.
 - Permet de chercher n'importe quelle date et heure, avec la journée entière en un coup d'œil.
+- Disponible en français, anglais et espagnol (choix en bas de page, mémorisé sur le téléphone).
 - S'installe sur l'écran d'accueil d'un téléphone et marche hors connexion.
 
 ## Installer sur un téléphone

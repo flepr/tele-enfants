@@ -125,8 +125,14 @@ button.reset:active{transform:translate(2px,2px); box-shadow:1px 1px 0 var(--edg
 .legend span{display:inline-flex; align-items:center; gap:6px}
 .legend i{width:14px; height:14px; border-radius:4px; border:2px solid var(--edge); background:var(--k); display:inline-block}
 
-footer{color:var(--muted); font-size:13px; display:flex; flex-direction:column; gap:4px}
+footer{color:var(--muted); font-size:13px; display:flex; flex-direction:column; gap:12px}
 footer p{margin:0}
+.langs{display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px}
+.langs > span{font-weight:800}
+.seg{display:inline-flex; border:2px solid var(--edge); border-radius:10px; overflow:hidden; box-shadow:3px 3px 0 var(--edge); background:var(--surface)}
+.seg button{border:0; background:transparent; color:var(--ink); font-weight:800; font-size:14px; padding:0 14px; min-height:44px; cursor:pointer}
+.seg button + button{border-left:2px solid var(--edge)}
+.seg button[aria-pressed="true"]{background:var(--coral); color:#2B2A33}
 @media (prefers-reduced-motion: reduce){ .bar i{transition:none} }
 </style>
 </head>
@@ -141,7 +147,7 @@ footer p{margin:0}
   </header>
 
   <section id="hero" class="hero box k-g" aria-live="polite">
-    <span class="eyebrow">En ce moment</span>
+    <span class="eyebrow" data-i18n="now">En ce moment</span>
     <div class="hero-name"><div class="badge" id="heroBadge">G</div><strong id="heroName">Gabriel</strong></div>
     <div class="slot num" id="heroSlot">&nbsp;</div>
     <div class="bar" aria-hidden="true"><i id="heroBar" style="width:0%"></i></div>
@@ -149,16 +155,16 @@ footer p{margin:0}
   </section>
 
   <section>
-    <h2 style="margin-bottom:12px">Prochains tours</h2>
+    <h2 style="margin-bottom:12px" data-i18n="next">Prochains tours</h2>
     <div class="list" id="next"></div>
   </section>
 
   <section class="search box" aria-labelledby="searchTitle">
-    <h2 id="searchTitle">Chercher un créneau</h2>
+    <h2 id="searchTitle" data-i18n="search">Chercher un créneau</h2>
     <div class="fields">
-      <div class="field"><label for="qDate">Date</label><input type="date" id="qDate"></div>
-      <div class="field"><label for="qHour">Heure</label><select id="qHour"></select></div>
-      <button type="button" class="reset" id="qNow">Maintenant</button>
+      <div class="field"><label for="qDate" data-i18n="date">Date</label><input type="date" id="qDate"></div>
+      <div class="field"><label for="qHour" data-i18n="hour">Heure</label><select id="qHour"></select></div>
+      <button type="button" class="reset" id="qNow" data-i18n="nowBtn">Maintenant</button>
     </div>
     <div class="answer k-g" id="answer" aria-live="polite">
       <div class="badge" id="ansBadge">G</div>
@@ -172,36 +178,82 @@ footer p{margin:0}
   </section>
 
   <footer>
-    <p>La règle : jour du mois + heure, divisé par 3. Reste 1 : Gabriel. Reste 2 : Clément. Reste 0 : Austin.</p>
-    <p>Télé Enfants v<span id="ver">1.0.2</span></p>
+    <p data-i18n="rule">La règle : jour du mois + heure, divisé par 3. Reste 1 : Gabriel. Reste 2 : Clément. Reste 0 : Austin.</p>
+    <div class="langs" role="group" aria-labelledby="langLabel">
+      <span id="langLabel" data-i18n="lang">Langue</span>
+      <div class="seg">
+        <button type="button" data-lang="fr" lang="fr" aria-pressed="true">Français</button>
+        <button type="button" data-lang="en" lang="en" aria-pressed="false">English</button>
+        <button type="button" data-lang="es" lang="es" aria-pressed="false">Español</button>
+      </div>
+    </div>
+    <p>Télé Enfants v<span id="ver">1.1.0</span></p>
   </footer>
 </div>
 
 <script>
 (function(){
-  var VERSION = '1.0.2';
+  var VERSION = '1.1.0';
   document.getElementById('ver').textContent = VERSION;
   var KIDS = [
     {key:'a', name:'Austin', initial:'A'},
     {key:'g', name:'Gabriel', initial:'G'},
     {key:'c', name:'Clément', initial:'C'}
   ];
+  function pad(n){ return String(n).padStart(2, '0'); }
+
+  var I18N = {
+    fr: {
+      locale:'fr-FR', now:'En ce moment', next:'Prochains tours', search:'Chercher un créneau', date:'Date', hour:'Heure', nowBtn:'Maintenant', lang:'Langue',
+      rule:'La règle : jour du mois + heure, divisé par 3. Reste 1 : Gabriel. Reste 2 : Clément. Reste 0 : Austin.',
+      h:function(n){ return n + 'h'; },
+      slot:function(a, b){ return 'de ' + a + ' à ' + b; }, midnight:'minuit',
+      left:function(d){ return 'encore ' + d; }, inT:function(d){ return 'dans ' + d; },
+      dur:function(hh, mm){ return hh + ' h' + (mm ? ' ' + pad(mm) : ''); },
+      tomorrow:'demain', today:"Aujourd'hui", remainder:'reste',
+      dayTitle:function(s){ return 'Toute la journée du ' + s; },
+      pick:'Choisis une date', empty:'Le champ Date est vide.'
+    },
+    en: {
+      locale:'en-GB', now:'Right now', next:'Next turns', search:'Find a time slot', date:'Date', hour:'Time', nowBtn:'Now', lang:'Language',
+      rule:'The rule: day of the month + hour, divided by 3. Remainder 1: Gabriel. Remainder 2: Clément. Remainder 0: Austin.',
+      h:function(n){ return pad(n) + ':00'; },
+      slot:function(a, b){ return a + ' to ' + b; }, midnight:'midnight',
+      left:function(d){ return d + ' left'; }, inT:function(d){ return 'in ' + d; },
+      dur:function(hh, mm){ return hh + ' h' + (mm ? ' ' + pad(mm) + ' min' : ''); },
+      tomorrow:'tomorrow', today:'Today', remainder:'remainder',
+      dayTitle:function(s){ return 'The whole day: ' + s; },
+      pick:'Pick a date', empty:'The Date field is empty.'
+    },
+    es: {
+      locale:'es-ES', now:'Ahora mismo', next:'Próximos turnos', search:'Buscar un horario', date:'Fecha', hour:'Hora', nowBtn:'Ahora', lang:'Idioma',
+      rule:'La regla: día del mes + hora, dividido entre 3. Resto 1: Gabriel. Resto 2: Clément. Resto 0: Austin.',
+      h:function(n){ return pad(n) + ':00'; },
+      slot:function(a, b){ return 'de ' + a + ' a ' + b; }, midnight:'medianoche',
+      left:function(d){ return 'quedan ' + d; }, inT:function(d){ return 'en ' + d; },
+      dur:function(hh, mm){ return hh + ' h' + (mm ? ' ' + pad(mm) + ' min' : ''); },
+      tomorrow:'mañana', today:'Hoy', remainder:'resto',
+      dayTitle:function(s){ return 'Todo el día del ' + s; },
+      pick:'Elige una fecha', empty:'El campo Fecha está vacío.'
+    }
+  };
+  var LANG_KEY = 'tele-enfants-lang';
+  var lang = 'fr';
+  try { var saved = localStorage.getItem(LANG_KEY); if (saved && I18N[saved]) lang = saved; } catch (e) {}
+  var T, fmtDay, fmtDayYear;
+
   function kidAt(day, hour){ return KIDS[(day + hour) % 3]; }
   function setKid(el, kid){ el.classList.remove('k-g','k-c','k-a'); el.classList.add('k-' + kid.key); }
-  function h(n){ return n + 'h'; }
-  function slotText(hour){ return 'de ' + h(hour) + ' à ' + (hour === 23 ? 'minuit' : h(hour + 1)); }
-  var fmtDay = new Intl.DateTimeFormat('fr-FR', {weekday:'long', day:'numeric', month:'long'});
-  var fmtDayYear = new Intl.DateTimeFormat('fr-FR', {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+  function h(n){ return T.h(n); }
+  function slotText(hour){ return T.slot(h(hour), hour === 23 ? T.midnight : h(hour + 1)); }
   function cap(s){ return s.charAt(0).toUpperCase() + s.slice(1); }
-  function pad(n){ return String(n).padStart(2, '0'); }
   function sameDay(a, b){ return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
   function isoDate(d){ return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
   function dur(mins){
     if (mins < 60) return mins + ' min';
-    var hh = Math.floor(mins / 60), mm = mins % 60;
-    return hh + ' h' + (mm ? ' ' + pad(mm) : '');
+    return T.dur(Math.floor(mins / 60), mins % 60);
   }
-  function calcText(day, hour){ var s = day + hour; return day + ' + ' + hour + ' = ' + s + ', reste ' + (s % 3); }
+  function calcText(day, hour){ var s = day + hour; return day + ' + ' + hour + ' = ' + s + ', ' + T.remainder + ' ' + (s % 3); }
   function nextSlotFor(now, kid){
     for (var i = 1; i <= 72; i++){
       var c = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours() + i);
@@ -211,6 +263,22 @@ footer p{margin:0}
   }
   var $ = function(id){ return document.getElementById(id); };
   var touched = false;
+  var hourSel = $('qHour');
+
+  function applyLang(){
+    T = I18N[lang];
+    fmtDay = new Intl.DateTimeFormat(T.locale, {weekday:'long', day:'numeric', month:'long'});
+    fmtDayYear = new Intl.DateTimeFormat(T.locale, {weekday:'long', day:'numeric', month:'long', year:'numeric'});
+    document.documentElement.lang = lang;
+    document.querySelectorAll('[data-i18n]').forEach(function(el){ el.textContent = T[el.getAttribute('data-i18n')]; });
+    document.querySelectorAll('.seg button').forEach(function(b){ b.setAttribute('aria-pressed', String(b.getAttribute('data-lang') === lang)); });
+    var keep = hourSel.value;
+    hourSel.innerHTML = '';
+    for (var i = 0; i < 24; i++){
+      var o = document.createElement('option'); o.value = i; o.textContent = h(i); hourSel.appendChild(o);
+    }
+    if (keep !== '') hourSel.value = keep;
+  }
 
   function renderLive(){
     var now = new Date();
@@ -219,7 +287,7 @@ footer p{margin:0}
     setKid($('hero'), kid);
     $('heroBadge').textContent = kid.initial;
     $('heroName').textContent = kid.name;
-    $('heroSlot').textContent = slotText(hour) + ' · encore ' + dur(60 - now.getMinutes());
+    $('heroSlot').textContent = slotText(hour) + ' · ' + T.left(dur(60 - now.getMinutes()));
     $('heroBar').style.width = Math.round(now.getMinutes() / 60 * 100) + '%';
     $('heroCalc').textContent = calcText(day, hour);
 
@@ -231,17 +299,13 @@ footer p{margin:0}
       var mins = Math.round((o.at - now) / 60000);
       var today = sameDay(o.at, now);
       html += '<div class="row box k-' + o.kid.key + '"><div class="badge">' + o.kid.initial + '</div>' +
-        '<div class="who"><b>' + o.kid.name + '</b><span class="num">' + slotText(o.at.getHours()) + ' · dans ' + dur(mins) + '</span></div>' +
-        '<div class="when num">' + (today ? '' : 'demain ') + h(o.at.getHours()) + '</div></div>';
+        '<div class="who"><b>' + o.kid.name + '</b><span class="num">' + slotText(o.at.getHours()) + ' · ' + T.inT(dur(mins)) + '</span></div>' +
+        '<div class="when num">' + (today ? '' : T.tomorrow + ' ') + h(o.at.getHours()) + '</div></div>';
     });
     $('next').innerHTML = html;
     if (!touched) syncQueryToNow(false); else renderQuery();
   }
 
-  var hourSel = $('qHour');
-  for (var i = 0; i < 24; i++){
-    var o = document.createElement('option'); o.value = i; o.textContent = h(i); hourSel.appendChild(o);
-  }
   function syncQueryToNow(markUntouched){
     var now = new Date();
     $('qDate').value = isoDate(now);
@@ -258,8 +322,8 @@ footer p{margin:0}
   function renderQuery(){
     var d = readQueryDate(), hour = +hourSel.value, now = new Date();
     if (!d){
-      $('ansName').textContent = 'Choisis une date';
-      $('ansText').textContent = 'Le champ Date est vide.';
+      $('ansName').textContent = T.pick;
+      $('ansText').textContent = T.empty;
       $('ansBadge').textContent = '?';
       return;
     }
@@ -267,9 +331,9 @@ footer p{margin:0}
     setKid($('answer'), kid);
     $('ansBadge').textContent = kid.initial;
     $('ansName').textContent = kid.name;
-    var label = sameDay(d, now) ? "Aujourd'hui" : cap((d.getFullYear() === now.getFullYear() ? fmtDay : fmtDayYear).format(d));
+    var label = sameDay(d, now) ? T.today : cap((d.getFullYear() === now.getFullYear() ? fmtDay : fmtDayYear).format(d));
     $('ansText').textContent = label + ', ' + slotText(hour) + ' · ' + calcText(d.getDate(), hour);
-    $('dayTitle').textContent = 'Toute la journée du ' + fmtDay.format(d);
+    $('dayTitle').textContent = T.dayTitle(fmtDay.format(d));
     var isToday = sameDay(d, now), out = '';
     for (var k = 0; k < 24; k++){
       var kd = kidAt(d.getDate(), k);
@@ -289,7 +353,16 @@ footer p{margin:0}
     hourSel.value = b.getAttribute('data-h');
     renderQuery();
   });
+  document.querySelector('.seg').addEventListener('click', function(e){
+    var b = e.target.closest('button[data-lang]');
+    if (!b || b.getAttribute('data-lang') === lang) return;
+    lang = b.getAttribute('data-lang');
+    try { localStorage.setItem(LANG_KEY, lang); } catch (err) {}
+    applyLang();
+    renderLive();
+  });
 
+  applyLang();
   renderLive();
   setInterval(renderLive, 20000);
   document.addEventListener('visibilitychange', function(){ if (!document.hidden) renderLive(); });
